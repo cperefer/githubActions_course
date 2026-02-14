@@ -1,6 +1,6 @@
-import { screen, render } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+// @vitest-environment happy-dom
 import Counter from '.';
+import { render, screen } from 'test/utilities';
 
 test('it should render the component', () => {
   render(<Counter />);
@@ -9,8 +9,7 @@ test('it should render the component', () => {
 });
 
 test('it should increment when the "Increment" button is pressed', async () => {
-  const user = userEvent.setup();
-  render(<Counter />);
+  const { user } = render(<Counter />);
 
   const currentCount = screen.getByTestId('current-count');
   const incrementButton = screen.getByRole('button', { name: 'Increment' });
@@ -20,9 +19,19 @@ test('it should increment when the "Increment" button is pressed', async () => {
   expect(currentCount).toHaveTextContent('1');
 });
 
-test.todo('it should render the component with an initial count', () => {});
+test('it should render the component with an initial count', () => {
+  render(<Counter initialCount={2} />);
+  const currentCount = screen.getByTestId('current-count');
+  expect(currentCount).toHaveTextContent('2');
+});
 
-test.todo(
-  'it should reset the count when the "Reset" button is pressed',
-  async () => {},
-);
+test('it should reset the count when the "Reset" button is pressed', async () => {
+  const { user } = render(<Counter initialCount={2} />);
+  const currentCount = screen.getByTestId('current-count');
+  const button = screen.getByRole('button', { name: /reset/i });
+
+  expect(currentCount).toHaveTextContent('2');
+
+  await user.click(button);
+  expect(currentCount).toHaveTextContent('0');
+});
