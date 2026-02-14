@@ -10,23 +10,24 @@ jobs:
   unit-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: 'npm'
-      - run: npm ci
+      - name: Checkout and Setup Node
+        uses: ./.github/actions/checkout-and-setup
       - run: npm test
 
   build:
+    steps:
+      - name: Checkout and Setup Node
+        uses: ./.github/actions/checkout-and-setup
+      - run: npm run build
+
+  coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - name: Checkout and Setup Node
+        uses: ./.github/actions/checkout-and-setup
+      - run: npm test -- --coverage
+      - uses: actions/upload-artifact@v3
+        name: Archive coverage report
         with:
-          node-version: 18
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run build
+          name: coverage-report
+          path: coverage
